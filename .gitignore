@@ -1,0 +1,11 @@
+#Entorno virtual
+venv/
+backend/venv/
+
+
+# Python
+__pycache__/
+*.pyc
+.env
+#clinica/clinica/settings.py
+backend/clinica/datadump.json
