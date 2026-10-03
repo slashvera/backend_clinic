@@ -1,17 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
-class Specialty(models.Model):
+class Especialidad(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField(blank=True)
     activo = models.BooleanField(default=True)
     class Meta:
-        db_table = 'specialty'
+        db_table = 'especialidades'
 
     def __str__(self):
         return f"{self.nombre} {self.descripcion}"
 
-class Patients(models.Model):
+class Paciente(models.Model):
     GENDER_CHOICES = [
         ('M','Masculino'),
         ('F','Femenino'),
@@ -52,13 +52,13 @@ class Patients(models.Model):
     #Conectamos el modeleo de usuario Django on el modelo pacientes
     #usuario =  models.OneToOneField(User, on_delete=models.CASCADE, related_name='pacientes')
     class Meta:
-        db_table ='patients'
+        db_table ='pacientes'
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos}"
 
 
-class Doctors(models.Model):
+class Doctor(models.Model):
     GENDER_CHOICES = [
             ('M','Masculino'),
             ('F','Femenino'),
@@ -72,9 +72,9 @@ class Doctors(models.Model):
     ]
 
     #Conetamos el modelo de usuario Django con el modelo doctores
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctors')
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctores')
 
-    especialidad = models.ForeignKey('Specialty', on_delete=models.PROTECT, related_name='doctors')
+    especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, related_name='doctores')
     tipo_documento = models.CharField(max_length=10, choices=DOCUMENT_TYPE_CHOICES, default='DNI')
     genero = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     numero_documento = models.CharField(max_length=20, unique=True)
@@ -82,25 +82,25 @@ class Doctors(models.Model):
     direccion = models.TextField(blank=True)
     telefono = models.CharField(max_length=50, blank=True)
     class Meta:
-        db_table = 'doctors'
+        db_table = 'doctores'
 
     def __str__(self):
         return f"{self.usuario.first_name} {self.usuario.last_name}"
 
-class Treatments(models.Model):
-    especialidad = models.ForeignKey('Specialty', on_delete=models.PROTECT, releated_name='treatments')
+class Tratamiento(models.Model):
+    especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, related_name='tratamientos')
     nombre = models.CharField(max_length=150)
     descripcion = models.TextField(blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     duracion_horas = models.PositiveIntegerField()
     activo = models.BooleanField(default=True)
     class Meta: 
-        db_table = 'treatments'
+        db_table = 'tratamientos'
 
     def __str__(self):
         return self.nombre
 
-class Appointments(models.Model):
+class Cita(models.Model):
     STATUS_CHOICES = [
         ('PENDIENTE', 'Pendiente'),
         ('CONFIRMADA', 'Confirmada'),
@@ -110,15 +110,34 @@ class Appointments(models.Model):
     ]
 
     token = models.CharField(max_length=50, unique=True)
-    paciente = models.ForeignKey(Patients, on_delete=models.PROTECT, related_name='appointments')
-    doctor = models.ForeignKey(Doctors, on_delete=models.PROTECT, related_name='appointments')
+    paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, related_name='citas')
+    doctor = models.ForeignKey(Doctor, on_delete=models.PROTECT, related_name='citas')
     fecha = models.DateField()
     hora = models.TimeField()
-    estado = models.CharField(max_length=20, choices = STATUS_CHOICES, default='PENIENTE')
+    estado = models.CharField(max_length=20, choices = STATUS_CHOICES, default='PENDIENTE')
     observacion = models.TextField( blank=True)
+
+    class Meta:
+        db_table = 'citas'
 
     def __str__(self):
         return (
             f"Cita {self.token} - "
             f"{self.paciente} - "
             f"{self.fecha} {self.hora}")
+
+class Cita_Tratamiento(models.Model):
+    cita = models.ForeignKey( Cita, on_delete=models.CASCADE, related_name='tratamientos')
+    tratamiento = models.ForeignKey( Tratamiento, on_delete=models.PROTECT, related_name='citas')
+    precio = models.DecimalField( max_digits=10, decimal_places=2)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['cita', 'tratamiento'],
+                name='unique_cita_tratamiento'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.cita} - {self.tratamiento}"
+
