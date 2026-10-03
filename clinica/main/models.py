@@ -72,9 +72,9 @@ class Doctor(models.Model):
     ]
 
     #Conetamos el modelo de usuario Django con el modelo doctores
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctores')
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor')
 
-    especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, related_name='doctores')
+    especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, related_name='doctor')
     tipo_documento = models.CharField(max_length=10, choices=DOCUMENT_TYPE_CHOICES, default='DNI')
     genero = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     numero_documento = models.CharField(max_length=20, unique=True)
@@ -92,7 +92,7 @@ class Tratamiento(models.Model):
     nombre = models.CharField(max_length=150)
     descripcion = models.TextField(blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    duracion_horas = models.PositiveIntegerField()
+    duracion_minutos = models.PositiveIntegerField()
     activo = models.BooleanField(default=True)
     class Meta: 
         db_table = 'tratamientos'
@@ -141,3 +141,26 @@ class Cita_Tratamiento(models.Model):
     def __str__(self):
         return f"{self.cita} - {self.tratamiento}"
 
+class Consulta_Historial(models.Model):
+    cita = models.OneToOneField(Cita, on_delete=models.CASCADE, related_name='historial')
+    motivo_consulta = models.TextField(blank=True)
+    observaciones = models.TextField(blank=True)
+    fecha_registro = models.DateTimeField( auto_now_add=True)
+
+    def __str__(self):
+        return f"Consulta - {self.cita.paciente}"
+
+class Ajuste(models.Model):
+
+    nombre_clinica = models.CharField(max_length=150)
+    descripcion_clinica = models.TextField(blank=True)
+    direccion = models.TextField(blank=True)
+
+    telefono = models.CharField(max_length=50,blank=True)
+    email = models.EmailField(blank=True)
+    divisa = models.CharField(max_length=10,default='USD')
+    logo = models.CharField(max_length=255,blank=True)
+    web = models.URLField(blank=True)
+
+    def __str__(self):
+        return self.nombre_clinica
