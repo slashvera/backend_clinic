@@ -13,32 +13,32 @@ class PacienteSerializer(serializers.ModelSerializer):
         model = Paciente
         fields = '__all__'
 
-class DoctorSerializers(serializers.ModelSerializer):
+class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
 
-class TratamientoSerializers(serializers.ModelSerializer):
+class TratamientoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tratamiento
         fields = '__all__'
 
-class CitaSerializers(serializers.ModelSerializer):
+class CitaSerializer(serializers.ModelSerializer):
     class Meta:
-        model: Cita
+        model = Cita
         fields = '__all__'
 
-class Cita_TratamientoSerializers(serializers.ModelSerializer):
+class Cita_TratamientoSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Cita_Tratamiento
         fields  = '__all__'
 
-class Consulta_HistorialSerializers(serializers.ModelSerializer):
+class Consulta_HistorialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Consulta_Historial
         fields = '__all__'
 
-class AjusteSerializers(serializers.ModelSerializer):
+class AjusteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ajuste
         fields = '__all__'
